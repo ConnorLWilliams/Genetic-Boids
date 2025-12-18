@@ -4,6 +4,9 @@ from typing import ClassVar, TypedDict, Tuple
 import random
 import math
 
+# prey boid algorithm based on the explanation and psuedocode found here!
+# https://vanhunteradams.com/Pico/Animal_Movement/Boids-predator.html
+
 @dataclass
 class Prey_Genome(Genome):
     visual_range: float # How far can I see
