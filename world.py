@@ -264,10 +264,6 @@ if __name__ == "__main__":
                 try:
                     gene_display_list = sys.argv[2:]
 
-                    print("****")
-                    print(gene_names)
-                    print(gene_display_list)
-                    print("****")
                     if len(gene_display_list) > 6:
                         raise ValueError("Too Many Values")
 
