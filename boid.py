@@ -20,6 +20,9 @@ class Genome(ABC):
 class Boid(ABC):
     _max_speed: ClassVar[float] = 10 # Global Speed Limit for Boids
     _world_bounds: ClassVar[Tuple[Tuple[float, float], Tuple[float, float]]] = ((-150, 150), (-150, 150))
+    _selection_type: ClassVar[str] = "roulette"
+    _mutation_rate: ClassVar[float] = 0.15
+    _crossover_type: ClassVar[str] = "bit-mask"
 
     def __init__(self, x, y, vx, vy, genome: Genome):
         # General
@@ -35,6 +38,10 @@ class Boid(ABC):
     @abstractmethod
     def get_update_vals(self, world):
         pass
+    
+    @abstractmethod
+    def get_fitness(self):
+        pass
 
     def update_vals(self):
         self.x = self.update_dict['new_x']
@@ -49,3 +56,7 @@ class Boid(ABC):
     @classmethod
     def set_world_bounds(cls, bounds: Tuple[Tuple[float, float], Tuple[float, float]]):
         cls._world_bounds = bounds
+
+    @classmethod
+    def set_selection_type(cls, selection_type: str):
+        cls._selection_type = selection_type

@@ -42,6 +42,8 @@ class Prey(Boid):
         boid_yvel_ave = boid_ypos_avg = boid_xvel_ave = boid_xpos_avg = boid_neighbor_count = close_dy = close_dx = 0
 
         boid_neighbor_count = 0
+        
+        self.age += 1
 
         new_x = 0
         new_y = 0
@@ -144,6 +146,8 @@ class Prey(Boid):
                 'new_vy': new_vy
                 }
 
+    def get_fitness(self):
+        return self.age
 
     def update_vals(self):
         self.x = self.update_dict['new_x']

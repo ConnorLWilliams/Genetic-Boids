@@ -8,7 +8,7 @@ import math
 class Predator_Genome(Genome):
     speed_limit: float
     speed_pref: float
-    
+    catch_radius: float
 
 class Predator(Boid):
     _max_speed: ClassVar[float] = 15
@@ -19,7 +19,8 @@ class Predator(Boid):
         self.y: float = y
         self.vx: float = vx
         self.vy: float = vy
-        age: int = 0
+        self.age: int = 0
+        self.kills: int = 0
         self.genome: Predator_Genome = genome
 
         self.update_dict: dict = {}
@@ -27,6 +28,8 @@ class Predator(Boid):
     def get_update_vals(self, world):
 
         #TODO: This is placeholder code --> figuring out specifics of Predator Functions
+        
+        self.age += 1
 
         prey = world['prey_population']
             
@@ -63,4 +66,9 @@ class Predator(Boid):
                 'new_vy': new_vy
                 }
 
+    def count_kill(self):
+        self.kills += 1
+        
+    def get_fitness(self):
+        return (self.kills / self.age)
 
