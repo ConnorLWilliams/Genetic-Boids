@@ -81,19 +81,19 @@ class Simulation:
         self.update_population()
 
     def update_population(self):
-        killed_prey = []
+        killed_prey = set()
         
         # TODO: Find a way to have this happen in the existing update loops
         for pred in self.pred_population:
             for prey in self.prey_population:
                 # NOTE: This can be done with intersecting paths to avoid tunneling, using radius for now.
                 if prey in killed_prey:
-                    pass
+                    continue
 
                 distance = math.dist([pred.x, pred.y], [prey.x, prey.y])
 
                 if distance < pred.genome.catch_radius:
-                    killed_prey.append(prey)
+                    killed_prey.add(prey)
                     break # (Only kill 1 prey at a time)
 
         for p in killed_prey:
