@@ -10,6 +10,8 @@ import math
 from Genetic_Algorithm import breed
 from collections import defaultdict
 import numpy as np
+import sys
+import time
 
 class Simulation:
 
@@ -102,15 +104,7 @@ class Simulation:
         for _ in range(len(killed_prey)):
             self.prey_population.append(breed(self.prey_population))
 
-if __name__ == "__main__":
-    config = configparser.ConfigParser()
-    try:
-        config.read('config.ini')
-    except configparser.Error as e:
-        print(f"Error reading config file: {e}")
-
-    sim = Simulation(config["World_Values"], config["Prey_Values"], config["Predator_Values"])
-   
+def real_time(sim, genome_params):
     #NOTE: The code below that handles the plotting was made with help of Claude AI, I am planning to make this some kind of accessable web app so this is a placeholder visualization for testing.
     fig = plt.figure(figsize=(20, 10))
     gs = fig.add_gridspec(3, 4, hspace=0.3, wspace=0.3)
@@ -125,8 +119,6 @@ if __name__ == "__main__":
     prey_scat = ax_sim.scatter([], [], c='blue', label='Prey', s=20)
     pred_scat = ax_sim.scatter([], [], c='red', label='Predators', s=30)
     ax_sim.legend()
-
-    genome_params = ['avoid_factor', 'matching_factor', 'centering_factor', 'predator_detection_range', 'predator_turn_factor', 'speed_pref']
 
     # Create subplots for each genome parameter
     param_axes = {}
@@ -147,7 +139,7 @@ if __name__ == "__main__":
     frame_count = 0
 
     def update(frame):
-        global frame_count
+        nonlocal frame_count
         frame_count += 1
     
         sim.tick()
@@ -184,4 +176,115 @@ if __name__ == "__main__":
         return [prey_scat, pred_scat] + list(param_lines.values())
 
     ani = FuncAnimation(fig, update, frames=None, interval=30, blit=False)
+    plt.show() 
+
+def fast_sim(sim, itterations):
+    history = defaultdict(list)
+    gene_names = list(vars(sim.prey_population[0].genome).keys())
+    
+    start_time = time.perf_counter()
+
+    for _ in range(itterations):
+        sim.tick()
+        
+        for param in gene_names:
+            values = [getattr(b.genome, param) for b in sim.prey_population]
+            avg_value = np.mean(values)
+            history[param].append(avg_value)
+    
+    end_time = time.perf_counter()
+
+    elapsed_time = end_time - start_time
+    print(f"Runtime: {elapsed_time:0.4f} seconds") 
+
+    plot_evolution(history, gene_names, itterations)
+
+def plot_evolution(history, gene_names, iterations):
+    """
+    Create subplots showing evolution of each parameter over time
+
+    NOTE: Same as above this is plotting is generated with Claude for now
+    """
+    num_params = len(gene_names)
+    
+    # Calculate grid dimensions
+    cols = 3
+    rows = (num_params + cols - 1) // cols  # Ceiling division
+    
+    fig, axes = plt.subplots(rows, cols, figsize=(15, 4 * rows))
+    fig.suptitle('Evolution of Genome Parameters Over Time', fontsize=16, y=0.995)
+    
+    # Flatten axes array for easy indexing
+    if num_params == 1:
+        axes = [axes]
+    else:
+        axes = axes.flatten() if num_params > cols else axes
+    
+    for idx, param in enumerate(gene_names):
+        ax = axes[idx]
+        generations = list(range(len(history[param])))
+        
+        ax.plot(generations, history[param], linewidth=2, color='blue')
+        ax.set_title(f'{param}', fontsize=12, fontweight='bold')
+        ax.set_xlabel('Generation')
+        ax.set_ylabel('Average Value')
+        ax.grid(True, alpha=0.3)
+    
+    # Hide extra subplots if any
+    for idx in range(num_params, len(axes)):
+        axes[idx].set_visible(False)
+    
+    plt.tight_layout()
     plt.show()
+
+
+
+
+if __name__ == "__main__":
+    config = configparser.ConfigParser()
+    try:
+        config.read('config.ini')
+    except configparser.Error as e:
+        print(f"Error reading config file: {e}")
+
+    sim = Simulation(config["World_Values"], config["Prey_Values"], config["Predator_Values"])
+   
+    if len(sys.argv) > 1:
+        match sys.argv[1]:
+            case 'fast_sim':
+                try:
+                    itter = int(sys.argv[2])
+                except:
+                    print("number of itterations misformated or not put. Default: 10,000")
+                    itter = 10000
+                fast_sim(sim, itter)
+            case _: # Also counts for if they put 'real_time'
+                gene_names = list(vars(sim.prey_population[0].genome).keys())
+                
+                try:
+                    gene_display_list = sys.argv[2:]
+
+                    print("****")
+                    print(gene_names)
+                    print(gene_display_list)
+                    print("****")
+                    if len(gene_display_list) > 6:
+                        raise ValueError("Too Many Values")
+
+                    elif not all(item in gene_names for item in gene_display_list): # is the input not a subset?
+                        raise ValueError("Failed Subset")
+
+                    else:
+                        genome_params = gene_display_list
+                except:
+                    print("Input display genes not valid or not given (max 6). Displaying default")
+                    genome_params = ['centering_factor', 'predator_turn_factor', 'speed_pref']
+
+                # Add choosing graph parameters here
+
+                real_time(sim, genome_params)
+
+        sys.exit(0) # end the script
+
+    genome_params = ['centering_factor', 'predator_turn_factor', 'speed_pref']
+    real_time(sim, genome_params) # Default Behavoir 
