@@ -70,10 +70,10 @@ class Simulation:
     def tick(self):
         for prey in self.prey_population:
             prey.get_update_vals(self.world)
-        
+
         for pred in self.pred_population:
             pred.get_update_vals(self.world)
-        
+
         for boid in self.prey_population:
             boid.update_vals()
 

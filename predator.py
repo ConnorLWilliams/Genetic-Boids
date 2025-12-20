@@ -6,9 +6,13 @@ import math
 
 @dataclass
 class Predator_Genome(Genome):
-    speed_limit: float
-    speed_pref: float
-    catch_radius: float
+    speed_limit: float # How fast can I go
+    speed_pref: float # How fast do I like to go
+    vision_radius: float # How far can I see
+    close_radius: float # Radius in which I look for a group
+    group_follow_size: int # What is the smallest size I consider a group
+    grouping_radius: float # How close to another Boid does one have to be to be considered a group
+    catch_radius: float # How close do I start following a Boid
 
 class Predator(Boid):
     _max_speed: ClassVar[float] = 15
@@ -28,7 +32,22 @@ class Predator(Boid):
     def get_update_vals(self, world):
 
         #TODO: This is placeholder code --> figuring out specifics of Predator Functions
-        
+
+        # New Behavoir Idea:
+            # 3 Rings of Behavoir
+                # Far: No Prey Boids Near
+                    # Move like a Boid --> Try to get close to any group
+                    # Move towards the average point of all boids in visual range
+                # Close: Near some Prey Boids
+                    # Move towards the closest group of n boids --> Pick a group to chase (clustering? DBScan?)
+                        # Has params: min_members, and max_hop_dist
+                    # Move towards the center of detected clusters
+                # Strike: Next to a Prey Boid
+                    # Move only towards the closest Boid --> Pick a Boid to chase
+                    # Close distance, Chase distance
+                        # Find a Boid in Close range (very small), Chase it as long as it is in Chase Range (Slightly Larger)
+
+
         self.age += 1
 
         prey = world['prey_population']
@@ -65,6 +84,17 @@ class Predator(Boid):
                 'new_vx': new_vx,
                 'new_vy': new_vy
                 }
+    
+    def far_behavoir(self, world):
+        pass
+
+    def close_behavoir(self, world):
+        pass
+
+    def strike_behavoir(self, world):
+        pass
+
+    def simple_behavoir(self, world)
 
     def count_kill(self):
         self.kills += 1
