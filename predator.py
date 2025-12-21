@@ -8,7 +8,7 @@ import math
 class Predator_Genome(Genome):
     speed_limit: float # How fast can I go
     speed_pref: float # How fast do I like to go
-    vision_radius: float # How far can I see
+    visual_range: float # How far can I see
     close_radius: float # Radius in which I look for a group
     group_follow_size: int # What is the smallest size I consider a group
     grouping_radius: float # How close to another Boid does one have to be to be considered a group
@@ -39,7 +39,7 @@ class Predator(Boid):
                     # Move like a Boid --> Try to get close to any group
                     # Move towards the average point of all boids in visual range
                 # Close: Near some Prey Boids
-                    # Move towards the closest group of n boids --> Pick a group to chase (clustering? DBScan?)
+                    # Move towards the closest group of n boids --> Pick a group to chase (clustering? Spacial Partitioning)
                         # Has params: min_members, and max_hop_dist
                     # Move towards the center of detected clusters
                 # Strike: Next to a Prey Boid
@@ -94,7 +94,8 @@ class Predator(Boid):
     def strike_behavoir(self, world):
         pass
 
-    def simple_behavoir(self, world)
+    def simple_behavoir(self, world):
+        pass
 
     def count_kill(self):
         self.kills += 1

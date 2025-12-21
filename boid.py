@@ -6,6 +6,9 @@ from abc import ABC, abstractmethod
 
 @dataclass
 class Genome(ABC):
+    
+    visual_range: float
+
     def vary_genome(self, rate) -> "Genome":
         """
         Randomly varies each field by +- range

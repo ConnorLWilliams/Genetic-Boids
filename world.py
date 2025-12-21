@@ -1,6 +1,7 @@
 from boid import Boid, Genome
 from prey import Prey, Prey_Genome
 from predator import Predator, Predator_Genome
+from spatial_partitioning import SpatialGrid
 import configparser
 from dataclasses import replace
 import random
@@ -37,6 +38,10 @@ class Simulation:
         self.world['prey_population'] = self.prey_population
         self.world['predator_population'] = self.pred_population
         self.world['world_bound'] = world_bounds
+        self.world['prey_grid'] = SpatialGrid(world_bounds)
+        self.world['prey_grid'].cell_size = sum([p.genome.visual_range for p in self.prey_population]) / len(self.prey_population)
+        self.world['predator_grid'] = SpatialGrid(world_bounds)
+        self.world['predator_grid'].cell_size = sum([p.genome.visual_range for p in self.pred_population]) / len(self.pred_population)
 
 
     def generate_prey_population(self, population_size, variation_rate, genome_params):
@@ -68,6 +73,9 @@ class Simulation:
         ]
 
     def tick(self):
+        self.world['prey_grid'].build_grid(self.prey_population)
+        self.world['predator_grid'].build_grid(self.pred_population)
+
         for prey in self.prey_population:
             prey.get_update_vals(self.world)
 

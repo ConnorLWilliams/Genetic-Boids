@@ -49,8 +49,9 @@ class Prey(Boid):
         new_y = 0
         new_vx = self.vx
         new_vy = self.vy
-
-        preys = world['prey_population']
+        
+        preys = world['prey_grid'].get_nearby_boids(self) # Get the nearby boids in the prey grid
+        preds = world['predator_grid'].get_nearby_boids(self) # Get the nearby boids in the pred grid
 
         for boid in preys:
             distance = math.dist([self.x, self.y], [boid.x, boid.y])
@@ -73,7 +74,7 @@ class Prey(Boid):
         new_vy = new_vy + (close_dy*self.genome.avoid_factor)
 
         # Predator Avoidance
-        for pred in world['predator_population']:
+        for pred in preds:
             dx = self.x - pred.x
             dy = self.y - pred.y
             dist = math.hypot(dx, dy)
